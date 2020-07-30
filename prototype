@@ -1,0 +1,61 @@
+#2020-07-22 classで実装
+import turtle as t
+import random
+
+lightcolors = {1:"green",2:"lightyellow",3:"lightpink",4:"red",5:"lightblue",
+              6:"orange",7:"lemonchiffon",8:"yellow",9:"pink",10:"blue"}
+colors = {}
+
+class flower:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+        
+    def stem(self,sp="green",sl=80):
+        t.setheading(90)
+        t.color(sp)
+        t.forward(sl)
+        t.setheading(0)
+#         return t.position()
+    def leaf(self,lp,lb,ln,ls):
+        def cir():
+            for _ in range(9):
+                t.forward(ls/9)
+                t.right(10)
+#         t.setheading(90)
+#         t.right(90)
+        t.color(lp,lb)#color of pen,brush
+        t.begin_fill()
+        cir()
+        t.right(90)
+        cir()
+        t.end_fill()
+    def petal(self,pp,pb,pn,ps):
+        t.setheading(90)
+        angle= 0
+        for _ in range(9):
+            self.leaf(pp,pb,pn,ps)
+            t.right(10)
+
+t.tracer(0)
+fl = [0]*200
+for i in range(200):
+    x = random.randint(-800,800)
+    y = random.randint(-600,400)
+    rnd_petal = random.randint(30,100)
+    rnd_stem = random.randint(100,200)
+    rnd_stem_color = random.randint(1,10)
+    rnd_petal_color = random.randint(1,10)
+    rnd_petal_br_color = random.randint(1,10)
+    
+    fl[i] = flower(x,y)
+    t.up()
+    
+    t.goto(x, y)
+    t.down()
+    fl[i].stem(lightcolors[rnd_stem_color],rnd_stem)
+    fl[i].petal(lightcolors[rnd_petal_color],lightcolors[rnd_petal_br_color],9,rnd_petal)
+#     fl[i].leaf("lightgreen","green",9,100,90)
+    
+t.update()
+t.done()
