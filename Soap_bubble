@@ -1,0 +1,165 @@
+#擬似シャボン玉を画面左側から出す
+%matplotlib nbagg
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as ani
+import math
+import random
+
+class Ball():
+
+    max_x = 20
+    min_x = -15
+    max_y = 15
+    min_y = -15
+
+    def __init__(self):
+        # 初期設定
+        self.x = -14
+        self.y = random.randint(-2,4)
+        self.v_x = random.randint(6, 10)
+        self.v_y = random.randint(-2, 3)
+        self.e = 0.1*random.randint(1, 3)#反発係数です
+        self.dt = 0.05*random.randint(2, 4)
+       
+
+    def state_update(self, ball_size):
+
+        self.x += self.v_x * self.dt 
+        self.y += self.v_y * self.dt
+
+        # 壁に到達すると反射するパターン
+#         if self.x > self.max_x:
+#             self.x = self.max_x
+#             self.velocity_x_update()
+#         elif self.x < self.min_x:
+#             self.x = self.min_x
+#             self.velocity_x_update()
+
+#         if self.y > self.max_y:
+#             self.y = self.max_y
+#             self.velocity_y_update()
+#         elif self.y < self.min_y:
+#             self.y = self.min_y
+#             self.velocity_y_update()
+
+        return self.x, self.y
+
+    def velocity_x_update(self):
+        self.v_x = -self.e * self.v_x
+
+    def velocity_y_update(self):
+        self.v_y = -self.e * self.v_y
+
+class Drawing_ball():# 描画するクラス
+    def __init__(self, ax):
+        color_list = ['coral', 'yellow', 'limegreen', 'lightblue', "gold", 'violet',
+                      "lightpink","red","tomato","lightgray","navy"]
+        color_num = random.randint(0, len(color_list)-1)
+        self.ball_img, = ax.plot([], [], color=color_list[color_num])
+        self.ax = ax
+
+    def draw_circle(self, center_x, center_y, balls_size):
+        circle_size = balls_size
+
+        steps = 100
+        self.circle_x = [] #位置を表す円のx
+        self.circle_y = [] #位置を表す円のy
+
+        for j in range(steps):
+
+            self.circle_x.append(center_x + circle_size*math.cos(j*2*math.pi/steps))
+            self.circle_y.append(center_y + circle_size*math.sin(j*2*math.pi/steps))
+
+        return self.circle_x, self.circle_y
+
+    def set_graph_data(self):
+        self.ball_img.set_data(self.circle_x, self.circle_y)
+
+        return self.ball_img, 
+
+def update_anim(i):
+    # iはステップ数
+    
+    balls_x = []
+    balls_y = []
+    balls_img_x = []
+    balls_img_y = []
+    balls_imgs = []
+
+    if i % 5 == 0: #ボール追加
+        balls_size.append(0.1*random.randint(8, 30))  
+        balls.append(Ball())
+        balls_drawers.append(Drawing_ball(ax))
+    #ボール個数を１個追加
+    balls_num = int(i/5) + 1
+
+    #全てのボールに対してアップデートする
+    for j in range(balls_num):
+        
+        temp_x, temp_y = balls[j].state_update(balls_size[j])
+
+        balls_x.append(temp_x)
+        balls_y.append(temp_y)
+
+        temp_x, temp_y = balls_drawers[j].draw_circle(balls_x[j], balls_y[j], balls_size[j])
+
+        balls_img_x.append(temp_x)
+        balls_img_y.append(temp_y)
+
+        balls_imgs.append(balls_drawers[j].set_graph_data())
+
+    # 時間
+    step_text.set_text('step = {0}'.format(i))
+
+    return balls_imgs
+
+#############################################################
+#########################__MAIN__############################
+
+# グラフ仕様設定
+fig = plt.figure()
+
+# Axes インスタンスを作成
+ax = fig.add_subplot(111)
+
+# 最大値と最小値⇒軸の範囲設定
+max_x = 20
+min_x = -15
+max_y = 15
+min_y = -15
+
+ax.set_xlim(min_x, max_x)
+ax.set_ylim(min_y, max_y)
+ax.axis("off")
+# ax.set_aspect('equal')
+
+# 軸の名前設定
+# ax.set_xlabel('X [m]') 
+# ax.set_ylabel('Y [m]') 
+
+#  グリッド
+# ax.grid(True)
+
+# 凡例
+# ax.legend()
+
+# ステップ数表示
+# step_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
+
+# ボールだけ作ってる
+balls_num = 1
+balls_size = []
+balls = []
+balls_drawers = []
+
+# intervalは描画の速さ
+animation = ani.FuncAnimation(fig, update_anim, interval=40, frames=1000)
+
+#アニメーションを保存
+# print('save_animation?')
+# shuold_save_animation = input()
+# if shuold_save_animation == "s": 
+#     animation.save('basic_animation.gif', writer='imagemagick')
+
+plt.show()
