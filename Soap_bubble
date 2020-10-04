@@ -1,4 +1,7 @@
-#擬似シャボン玉を画面左側から出す
+#ボール（擬似シャボン玉）を画面左側から出す
+#時間経過に伴いx軸方向へは進みにくくする
+#ステップ数を表示する
+
 %matplotlib nbagg
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,19 +17,22 @@ class Ball():
     min_y = -15
 
     def __init__(self):
-        # 初期設定
+        # 初期位置、初期速度
         self.x = -14
         self.y = random.randint(-2,4)
-        self.v_x = random.randint(6, 10)
-        self.v_y = random.randint(-2, 3)
-        self.e = 0.1*random.randint(1, 3)#反発係数です
-        self.dt = 0.05*random.randint(2, 4)
+        self.v_x = 0.1*random.randint(6, 9)
+        self.v_y = 0.1*random.randint(-2, 3)
+#         self.e = 0.1*random.randint(1, 3)
+
        
 
     def state_update(self, ball_size):
-
-        self.x += self.v_x * self.dt 
-        self.y += self.v_y * self.dt
+        
+        #時間経過に伴いx軸方向へは進みにくくする
+        self.v_x *= 0.001*random.randint(975, 999)
+        
+        self.x += self.v_x 
+        self.y += self.v_y 
 
         # 壁に到達すると反射するパターン
 #         if self.x > self.max_x:
@@ -51,7 +57,8 @@ class Ball():
     def velocity_y_update(self):
         self.v_y = -self.e * self.v_y
 
-class Drawing_ball():# 描画するクラス
+# ボールの描画
+class Drawing_ball():
     def __init__(self, ax):
         color_list = ['coral', 'yellow', 'limegreen', 'lightblue', "gold", 'violet',
                       "lightpink","red","tomato","lightgray","navy"]
@@ -76,10 +83,10 @@ class Drawing_ball():# 描画するクラス
     def set_graph_data(self):
         self.ball_img.set_data(self.circle_x, self.circle_y)
 
-        return self.ball_img, 
+        return self.ball_img,
 
 def update_anim(i):
-    # iはステップ数
+    # iはアニメフレームの枚数に相当する
     
     balls_x = []
     balls_y = []
@@ -91,10 +98,10 @@ def update_anim(i):
         balls_size.append(0.1*random.randint(8, 30))  
         balls.append(Ball())
         balls_drawers.append(Drawing_ball(ax))
-    #ボール個数を１個追加
+    #シャボン玉カウントを１個追加
     balls_num = int(i/5) + 1
 
-    #全てのボールに対してアップデートする
+    #全てのシャボン玉に対してアップデートする
     for j in range(balls_num):
         
         temp_x, temp_y = balls[j].state_update(balls_size[j])
@@ -145,9 +152,9 @@ ax.axis("off")
 # ax.legend()
 
 # ステップ数表示
-# step_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
+step_text = ax.text(0, 0, '', transform=ax.transAxes)
 
-# ボールだけ作ってる
+# シャボン玉
 balls_num = 1
 balls_size = []
 balls = []
